@@ -1,0 +1,14 @@
+instance/
+venv/
+.idea/
+.DS_Store
+__pycache__/
+backup/
+dist/
+*.pyc
+apl_internal.log
+migrations/
+.vscode/
+build/
+release/
+.idea/
