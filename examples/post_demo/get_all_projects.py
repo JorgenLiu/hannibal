@@ -20,7 +20,7 @@ def get_project_id():
     url_list = [Mission(unique_tag=i, url='https://www.xytzq.cn:9443/tzq/pc/project/getAllProjectList', method='POST',
                         data={'page': i, 'tradeid': 0, 'processid': 0}) for i in range(1, 5)]
     queue.init_queue(url_list)
-    collector = LocalCollector(collect_queue=queue, href_pool=pool, parse_function=collect_function, cache_size=3,
+    collector = LocalCollector(mission_queue=queue, href_pool=pool, parse_function=collect_function, cache_size=3,
                                data_type='data')
     collector.conquer()
 

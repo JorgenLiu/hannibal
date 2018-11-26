@@ -14,15 +14,20 @@ def demo_handler(response, url):
     print('handel 400')
 
 
-def demo_before_collect_middleware(url):
-    print('this is url: %s' % url)
+def demo_before_collect_middleware(mission):
+    print('this is url: %s' % mission.url)
+
+
+def demo_before_collect_middleware1(mission):
+    print('this is tag: %s' % mission.unique_tag)
 
 
 def ping_http_bin():
     url_list = [Mission(unique_tag=i, url='http://httpbin.org/get?t=%d' % i) for i in range(1, 500)]
     queue.init_queue(url_list)
-    collector = LocalCollector(collect_queue=queue, href_pool=pool, parse_function=collect_function, cache_size=3)
+    collector = LocalCollector(mission_queue=queue, href_pool=pool, parse_function=collect_function, cache_size=10)
     collector.register_middleware(demo_before_collect_middleware)
+    collector.register_middleware(demo_before_collect_middleware1)
     collector.register_error_handler(400, demo_handler)
     collector.conquer()
 

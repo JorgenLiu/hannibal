@@ -15,21 +15,20 @@ except ImportError:
 
 class DistributeCollector(object):
     _BEFORE_COLLECT_MIDDLEWARE_LIST = deque()
-    _AFTER_COLLECT_MIDDLEWARE_LIST = deque()
     _ERROR_HANDLER_DICT = dict()
 
-    def __init__(self, collect_queue, parse_queue, href_pool, seed_mission=None, cache_size=3, *args, **kwargs):
-        self.collect_queue = collect_queue
+    def __init__(self, mission_queue, parse_queue, href_pool, seed_mission=None, cache_size=3, *args, **kwargs):
+        self.mission_queue = mission_queue
         self.parse_queue = parse_queue
         self.href_pool = href_pool
         if seed_mission:
-            self.collect_queue.enqueue(seed_mission.serialize())
+            self.mission_queue.enqueue(seed_mission.serialize())
         self.trick_helper = TrickHelper()
         self.collect_loop = asyncio.new_event_loop()
         self.semaphore = asyncio.Semaphore(cache_size, loop=self.collect_loop)
         self.client_session = aiohttp.ClientSession(
             connector=aiohttp.TCPConnector(verify_ssl=False, loop=self.collect_loop), loop=self.collect_loop)
-        self.cache_queue = Queue(maxsize=cache_size)
+        self.collect_queue = Queue(maxsize=cache_size)
 
     @staticmethod
     def register_error_handler(code, handler, *args, **kwargs):
@@ -38,16 +37,13 @@ class DistributeCollector(object):
         DistributeCollector._ERROR_HANDLER_DICT[code] = handler
 
     @staticmethod
-    def register_middleware(middleware, attach_to='before_collect', *args, **kwargs):
+    def register_middleware(middleware, *args, **kwargs):
         assert callable(middleware)
-        if attach_to == 'before_collect':
-            DistributeCollector._BEFORE_COLLECT_MIDDLEWARE_LIST.append(middleware)
-        if attach_to == 'after_collect':
-            DistributeCollector._AFTER_COLLECT_MIDDLEWARE_LIST.append(middleware)
+        DistributeCollector._BEFORE_COLLECT_MIDDLEWARE_LIST.append(middleware)
 
     async def collect(self, *args, **kwargs):
         with (await self.semaphore):
-            mission_str = self.cache_queue.get()
+            mission_str = self.collect_queue.get()
             if isinstance(mission_str, bytes):
                 mission_str = mission_str.decode('utf-8')
             mission = Mission.deserialize(mission_str)
@@ -82,7 +78,7 @@ class DistributeCollector(object):
 
     def _pop_url(self) -> str:
         try:
-            url = self.collect_queue.dequeue()
+            url = self.mission_queue.dequeue()
             return url if url else ''
         except Exception as e:
             print(e)
@@ -100,16 +96,16 @@ class DistributeCollector(object):
             t.start()
 
             while 1:
-                if not self.cache_queue.full():
+                if not self.collect_queue.full():
                     url = self._pop_url()
                     if url:
-                        self.cache_queue.put(url)
-                    if limited and url == self.collect_queue.endpoint:
+                        self.collect_queue.put(url)
+                    if limited and url == self.mission_queue.endpoint:
                         break
                     if url:
                         asyncio.run_coroutine_threadsafe(self.collect(), loop=self.collect_loop)
         except KeyboardInterrupt:
-            self.collect_queue.serialize()
+            self.mission_queue.serialize()
             self.href_pool.serialize()
         finally:
             asyncio.run_coroutine_threadsafe(self.client_session.close(), loop=self.collect_loop)

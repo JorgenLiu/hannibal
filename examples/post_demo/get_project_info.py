@@ -13,7 +13,7 @@ async def collect_function(response):
 
 
 def get_project_info():
-    collector = LocalCollector(collect_queue=queue, href_pool=pool, parse_function=collect_function, cache_size=3,
+    collector = LocalCollector(mission_queue=queue, href_pool=pool, parse_function=collect_function, cache_size=3,
                                data_type='data')
     collector.conquer()
 

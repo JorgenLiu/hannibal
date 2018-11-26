@@ -14,8 +14,8 @@ class BaseParser(object):
     _BEFORE_PARSE_MIDDLEWARE_LIST = []
     _AFTER_PARSE_MIDDLEWARE_LIST = []
 
-    def __init__(self, collect_queue, parse_queue, href_pool):
-        self.collect_queue = collect_queue
+    def __init__(self, mission_queue, parse_queue, href_pool):
+        self.mission_queue = mission_queue
         self.parse_queue = parse_queue
         self.href_pool = href_pool
         self.meta_url = None
@@ -54,15 +54,15 @@ class BaseParser(object):
                     if html_content:
                         asyncio.run_coroutine_threadsafe(self.parse_page(html_content), loop=self.parse_loop)
         except KeyboardInterrupt:
-            self.collect_queue.serialize()
+            self.mission_queue.serialize()
             self.href_pool.serialize()
         finally:
             pass
 
 
 class IncreasingParser(object):
-    def __init__(self, collect_queue, parse_queue, href_pool):
-        self.collect_queue = collect_queue
+    def __init__(self, mission_queue, parse_queue, href_pool):
+        self.mission_queue = mission_queue
         self.parse_queue = parse_queue
         self.href_pool = href_pool
         self.url_pattern = None
@@ -95,7 +95,7 @@ class IncreasingParser(object):
         if self.go_forward(content_object):
             for mission in sub_mission_list:
                 if not self.href_pool.is_duplicate(mission.unique_tag):
-                    self.collect_queue.enqueue(mission.serialize())
+                    self.mission_queue.enqueue(mission.serialize())
 
     async def extract_data(self, content_object):
         """extract data from content"""
@@ -119,7 +119,7 @@ class IncreasingParser(object):
                     if html_content:
                         asyncio.run_coroutine_threadsafe(self.parse_page(html_content), loop=self.parse_loop)
         except KeyboardInterrupt:
-            self.collect_queue.serialize()
+            self.mission_queue.serialize()
             self.href_pool.serialize()
         finally:
             pass
