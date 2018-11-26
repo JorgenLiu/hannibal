@@ -48,7 +48,6 @@ class BaseParser(object):
         try:
             while 1:
                 if self.parse_queue.queue_size == 0:
-                    print('nothing to parse')
                     time.sleep(10)
                 else:
                     html_content = self.parse_queue.dequeue()
@@ -114,7 +113,6 @@ class IncreasingParser(object):
         try:
             while 1:
                 if self.parse_queue.queue_size == 0:
-                    print('nothing to parse')
                     time.sleep(10)
                 else:
                     html_content = self.parse_queue.dequeue()

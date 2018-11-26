@@ -62,7 +62,6 @@ class LocalCollector(object):
     async def _collect(self, mission):
         url = mission.url
         headers = self.trick_helper.trick()
-        print("url is not duplicated: %s" % url)
         async with self.client_session.request(mission.method, url,
                                                **{mission.data_type: mission.data, 'headers': headers})as response:
             process_task = asyncio.ensure_future(self.process_response(response, mission), loop=self.collect_loop)

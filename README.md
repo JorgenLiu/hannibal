@@ -22,4 +22,4 @@ Only basic parsing schedule is implemented in parser module, you need to overide
 
 ### Queue and Pool
 
-Both of the two brokers mentioned above are implemented in memory based mode and redis based mode. For memory based queue and pool, basic storage mechanism also implemented. 
+Both of the two brokers mentioned above are implemented in memory based mode and redis based mode. For memory based queue and pool, basic storage mechanism also implemented.
