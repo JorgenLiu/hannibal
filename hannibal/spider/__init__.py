@@ -1,2 +1,2 @@
-from .distribute_collector import DistributeCollector
-from .local_collector import LocalCollector
+from hannibal.spider.distribute_collector import DistributeCollector
+from hannibal.spider.local_collector import LocalCollector

@@ -1,8 +1,8 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='hannibal',
-    version='0.0.4',
+    version='0.0.7',
     author='JorgenLiu',
     author_email='avalon852456@gmail.com',
     url='https://github.com/JorgenLiu/hannibal',
@@ -10,7 +10,7 @@ setup(
     maintainer_email='avalon852456@gmail.com',
     license='MIT License',
     description=u'A light-weight crawler framework based on asyncio, aiohttp and redis.',
-    packages=['hannibal'],
+    packages=find_packages(),
     install_requires=[
         'aiohttp',
         'asyncio',

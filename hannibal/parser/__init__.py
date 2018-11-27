@@ -1,1 +1,1 @@
-from .parser import IncreasingParser, BaseParser
+from hannibal.parser.parser import IncreasingParser, BaseParser
