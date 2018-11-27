@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='hannibal',
-    version='0.0.3',
+    version='0.0.4',
     author='JorgenLiu',
     author_email='avalon852456@gmail.com',
     url='https://github.com/JorgenLiu/hannibal',
