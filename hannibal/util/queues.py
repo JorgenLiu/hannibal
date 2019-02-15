@@ -9,7 +9,6 @@ import os
 class RedisQueue(object):
     def __init__(self, name: str, host: str, pwd: str, port=6379, db=0, limited=False):
         self.name = name
-        self.address = '%s:%d' % (host, port)
         self._queue = Redis(host=host, port=port, db=db, password=pwd)
         self.limited = limited
         self.endpoint = None

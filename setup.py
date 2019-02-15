@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='hannibal',
-    version='0.0.8',
+    version='0.0.9',
     author='JorgenLiu',
     author_email='avalon852456@gmail.com',
     url='https://github.com/JorgenLiu/hannibal',
@@ -14,7 +14,6 @@ setup(
     install_requires=[
         'aiohttp',
         'asyncio',
-        'uvloop',
         'redis',
         'requests',
         'async-timeout'

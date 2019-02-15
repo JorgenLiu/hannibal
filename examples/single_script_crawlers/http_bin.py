@@ -5,7 +5,7 @@ pool = MemPool(name='http_bin')
 queue = MemQueue(name='http_bin', limited=True)
 
 
-async def collect_function(response):
+async def collect_function(response, mission):
     json_obj = await extract_json(response)
     print(json_obj)
 

@@ -29,6 +29,7 @@ class LocalCollector(object):
         self.client_session = aiohttp.ClientSession(
             connector=aiohttp.TCPConnector(verify_ssl=False, loop=self.collect_loop), loop=self.collect_loop)
         self.collect_queue = Queue(maxsize=cache_size)
+        self.end = False
 
     @staticmethod
     def register_error_handler(code, handler, *args, **kwargs):
@@ -77,7 +78,7 @@ class LocalCollector(object):
                 handler(response, mission)
             return None
         else:
-            await self.parse_function(response)
+            await self.parse_function(response, mission)
             return mission.unique_tag
 
     def _pop_url(self) -> str:
@@ -105,6 +106,7 @@ class LocalCollector(object):
                     if url:
                         self.collect_queue.put(url)
                     if limited and url == self.mission_queue.endpoint:
+                        self.end = True
                         break
                     if url:
                         asyncio.run_coroutine_threadsafe(self.collect(), loop=self.collect_loop)

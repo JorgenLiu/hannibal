@@ -1,5 +1,4 @@
-import random
-from queue import Queue
+from random import choice
 from threading import Thread
 
 
@@ -34,10 +33,11 @@ class TrickHelper(object):
             raise AttributeError(
                 "Proxy provider must be configured if you would like to use proxy server for request redirection.")
         elif self.use_proxy:
-            self._proxy_pool = Queue()
+            self._proxy_pool = []
             self.register_proxy_provider(proxy_provider)
             self.update_pool()
         self.referer = referer
+        self.header = dict()
 
     def register_proxy_provider(self, proxy_provider):
         if not hasattr(proxy_provider, '__call__'):
@@ -47,27 +47,31 @@ class TrickHelper(object):
 
     def trick(self):
         agent = self.get_random_agent()
-        trick_dict = {'User-Agent': agent}
+        self.header['User-Agent'] = agent
         if self.referer:
-            trick_dict['Referer'] = self.referer
-        return trick_dict
+            self.header['Referer'] = self.referer
+        return self.header
+
+    def customize_header(self, header_dict):
+        for k, v in header_dict.items():
+            self.header[k] = v
 
     @staticmethod
     def get_random_agent():
-        return TrickHelper.HEADERS[random.randint(0, len(TrickHelper.HEADERS) - 1)]
+        return choice(TrickHelper.HEADERS)
 
     def get_proxy(self):
         if not self.use_proxy:
             return None
         else:
             try:
-                proxy_ip = self._proxy_pool.get()
+                proxy_ip = choice(self._proxy_pool)
             except Exception as e:
                 print(e)
                 return None
             else:
                 http_request_proxy = self.proxy_prefix + proxy_ip
-                if self._proxy_pool.qsize() <= self.threshold:
+                if len(self._proxy_pool) <= self.threshold:
                     Thread(target=self.update_pool()).start()
                 return http_request_proxy
 
@@ -78,7 +82,7 @@ class TrickHelper(object):
             self.lock = True
             proxy_list = self.proxy_provider()
             for proxy in proxy_list:
-                self._proxy_pool.put(proxy)
+                self._proxy_pool.append(proxy)
 
 
 if __name__ == '__main__':
